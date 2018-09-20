@@ -7,7 +7,7 @@ setup(
     packages=find_packages(exclude=['tests*']),
     license='MIT',
     description='SFMergeUtility',
-    long_description=open('README.txt').read(),
+    long_description=open('README.md').read(),
     install_requires=[''],
     url='',
     author='SFDev',

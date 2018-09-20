@@ -1,4 +1,4 @@
-README.txt
+README.md
 setup.py
 SFMergeUtility/SFMergeUtility.py
 SFMergeUtility/__init__.py

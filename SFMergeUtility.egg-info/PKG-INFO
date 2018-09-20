@@ -6,5 +6,7 @@ Home-page: UNKNOWN
 Author: SFDev
 Author-email: SFDev
 License: MIT
-Description: SFMergeUtility
+Description: # SFMergeUtility
+        Merge Utility for service fabric
+        
 Platform: UNKNOWN

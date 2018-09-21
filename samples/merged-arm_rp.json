@@ -1,0 +1,128 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "defaultValue": "SouthCentralUS",
+      "type": "String",
+      "metadata": {
+        "description": "Location of the resources."
+      }
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2018-09-01-preview",
+      "name": "counterApp",
+      "type": "Microsoft.ServiceFabricMesh/applications",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "Microsoft.ServiceFabricMesh/secrets/azurefilesecret/values/v1",
+        "Microsoft.ServiceFabricMesh/volumes/counterVolumeWindows"
+      ],
+      "properties": {
+        "description": "Azure Service Fabric Mesh Counter Application.",
+        "services": [
+          {
+            "name": "counterService",
+            "properties": {
+              "description": "A web service that serves the counter value stored in the Azure Files volume.",
+              "osType": "Windows",
+              "codePackages": [
+                {
+                  "name": "counterService",
+                  "image": "docker.io/username/counter:v1",
+                  "imageRegistryCredential": {
+                    "server": "docker.io",
+                    "username": "username",
+                    "password": [
+                      "reference('Secrets/azurefilesecret/Values/v1')"
+                    ]
+                  },
+                  "volumes": [
+                    {
+                      "name": "myvol",
+                      "creationParameters": {
+                        "kind": "ServiceFabricVolumeDisk",
+                        "sizeDisk": "Small"
+                      },
+                      "destinationPath": "C:\\app\\data"
+                    }
+                  ],
+                  "endpoints": [
+                    {
+                      "name": "counterServiceListener",
+                      "port": 8080
+                    }
+                  ],
+                  "environmentVariables": [
+                    {
+                      "name": "STATE_FOLDER_NAME",
+                      "value": "CounterService11"
+                    }
+                  ],
+                  "resources": {
+                    "requests": {
+                      "cpu": 0.5,
+                      "memoryInGB": 1.0
+                    }
+                  }
+                }
+              ],
+              "replicaCount": 1,
+              "networkRefs": [
+                {
+                  "name": "[resourceId('Microsoft.ServiceFabricMesh/networks', 'counterAppNetwork')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2018-09-01-preview",
+      "name": "counterVolumeWindows",
+      "type": "Microsoft.ServiceFabricMesh/volumes",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "Microsoft.ServiceFabricMesh/secrets/azurefilesecret/values/v1"
+      ],
+      "properties": {
+        "description": "Azure Files storage volume for counter App.",
+        "provider": "SFAzureFile",
+        "azureFileParameters": {
+          "shareName": "voltestshare",
+          "accountName": "storageAccountName",
+          "accountKey": [
+            "reference(secrets/azurefilesecret/values/v1)"
+          ]
+        }
+      }
+    },
+    {
+      "apiVersion": "2018-09-01-preview",
+      "name": "azurefilesecret",
+      "type": "Microsoft.ServiceFabricMesh/secrets",
+      "location": "[parameters('location')]",
+      "dependsOn": [],
+      "properties": {
+        "kind": "inlinedValue",
+        "description": "Account key for azure files",
+        "contentType": "text/plain"
+      }
+    },
+    {
+      "apiVersion": "2018-09-01-preview",
+      "name": "azurefilesecret/v1",
+      "type": "Microsoft.ServiceFabricMesh/secrets/values",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "Microsoft.ServiceFabricMesh/secrets/azurefilesecret"
+      ],
+      "properties": {
+        "value": "SomeTextValue"
+      }
+    }
+  ]
+}

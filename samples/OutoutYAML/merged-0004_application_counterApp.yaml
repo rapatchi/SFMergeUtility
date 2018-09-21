@@ -1,0 +1,43 @@
+type: application
+name: counterApp
+fullyQualifiedResourceName: counterApp
+api-version: 6.4-preview
+description:
+  application:
+    schemaVersion: 1.0.0-preview2
+    name: counterApp
+    properties:
+      description: Azure Service Fabric Mesh Counter Application.
+      services:
+      - name: counterService
+        properties:
+          description: A web service that serves the counter value stored in the Azure Files volume.
+          osType: Windows
+          codePackages:
+          - name: counterService
+            image: docker.io/username/counter:v1
+            imageRegistryCredential:
+              server: docker.io
+              username: username
+              password:
+              - reference('Secrets/azurefilesecret/Values/v1')
+            volumes:
+            - name: myvol
+              creationParameters:
+                kind: ServiceFabricVolumeDisk
+                sizeDisk: Small
+              destinationPath: C:\app\data
+            endpoints:
+            - name: counterServiceListener
+              port: 8080
+            environmentVariables:
+            - name: STATE_FOLDER_NAME
+              value: CounterService11
+            resources:
+              requests:
+                cpu: 0.5
+                memoryInGB: 1
+          replicaCount: 1
+          networkRefs:
+          - name: counterAppNetwork
+

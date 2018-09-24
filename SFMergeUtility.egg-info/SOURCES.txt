@@ -4,5 +4,8 @@ SFMergeUtility.egg-info/PKG-INFO
 SFMergeUtility.egg-info/SOURCES.txt
 SFMergeUtility.egg-info/dependency_links.txt
 SFMergeUtility.egg-info/top_level.txt
+src/ARMDocumentCreator.py
 src/SFMergeUtility.py
+src/SFYamlMerge.py
+src/SFYamlToJSON.py
 src/__init__.py

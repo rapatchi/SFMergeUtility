@@ -1,9 +1,5 @@
 {
-  "type": "volume",
-  "name": "counterVolumeWindows",
-  "api-version": "6.4-preview",
-  "fullyQualifiedResourceName": "counterVolumeWindows",
-  "description": {
+  "volume": {
     "schemaVersion": "1.0.0-preview2",
     "name": "counterVolumeWindows",
     "properties": {

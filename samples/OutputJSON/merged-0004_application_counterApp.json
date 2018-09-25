@@ -1,9 +1,5 @@
 {
-  "type": "application",
-  "name": "counterApp",
-  "api-version": "6.4-preview",
-  "fullyQualifiedResourceName": "counterApp",
-  "description": {
+  "application": {
     "schemaVersion": "1.0.0-preview2",
     "name": "counterApp",
     "properties": {

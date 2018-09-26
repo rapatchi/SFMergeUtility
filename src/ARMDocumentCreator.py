@@ -2,6 +2,7 @@ import json
 from PropertyNames import PropertyNames
 from Constants import Constants
 from Schema import Schema
+from ArmParameter import ArmParameter, MetaData
 
 class ArmDocumentGenerator:
 
@@ -9,9 +10,17 @@ class ArmDocumentGenerator:
     def generate(sf_json_resources, region, output_file_name):
         with open(output_file_name, 'w') as fp:
             arm_dict = {}
-            writer = ArmDocumentGenerator.begin_write_arm_document(arm_dict)
-
-            arm_doc_string = ArmDocumentGenerator.end_write_arm_document(writer)
+            parameter_info = {}
+            property_value_map = {}
+            arm_dict = ArmDocumentGenerator.begin_write_arm_document(arm_dict)
+            parameter_info[PropertyNames.Location] = ArmDocumentGenerator.get_location_parameter(region)
+            property_value_map[PropertyNames.Location] = "[" + PropertyNames.Parameters + "('" + PropertyNames.Location +"')]"
+            # print "arm_dict:" + json.dumps(arm_dict)
+            # print "property_value_map" + json.dumps(property_value_map)
+            arm_dict = ArmDocumentGenerator.write_parameters(arm_dict, parameter_info)
+            print "write parametersarm_dict: \n" + json.dumps(arm_dict)
+            arm_dict = ArmDocumentGenerator.write_arm_resources(arm_dict, sf_json_resources, property_value_map)
+            arm_doc_string = ArmDocumentGenerator.end_write_arm_document(arm_dict)
             fp.write(arm_doc_string)
 
     @staticmethod
@@ -25,18 +34,31 @@ class ArmDocumentGenerator:
         return json.dumps(writer)
 
     @staticmethod
-    def write_arm_resources(writer, sf_json_resources):
+    def write_parameters(writer, parameters_info):
+        if not PropertyNames.Parameters in writer:
+            writer[PropertyNames.Parameters] = {}
+        for parameter in parameters_info.keys():
+            writer[PropertyNames.Parameters][parameter] = parameters_info[parameter].to_dict()
+        return writer
+
+    @staticmethod
+    def write_arm_resources(writer, sf_json_resources, property_value_map):
         dependencies = ArmDocumentGenerator.get_dependencies(sf_json_resources)
         for sf_json_resource in sf_json_resources:
             sf_resource = json.loads(sf_json_resource)
             kind, description = ArmDocumentGenerator.get_resource_kind_and_description(sf_resource)
-
+            print "kind:" + kind + "description:" + description
+            exit()
             if kind == Constants.Application:
-                None
+                writer = ArmDocumentGenerator.process_application(writer, description, dependencies, property_value_map)
             else:
-                None
+                writer = ArmDocumentGenerator.process_sf_resource(writer, description, kind, dependencies, property_value_map)
+        return writer
         
-
+    @staticmethod
+    def get_location_parameter(region):
+        return ArmParameter(region, "string", "Location of Resources")
+    
     @staticmethod
     def get_dependencies(sf_json_resources):
         dependencies = {}
@@ -263,4 +285,4 @@ class ArmDocumentGenerator:
 
 
 if __name__ == '__main__':
-    ArmDocumentGenerator.generate([], "eastus", "merged_rp_json.json")
+    ArmDocumentGenerator.generate(["D:\SFMergeUtility\samples\OutputYAML\merged-0003_volume_counterVolumeWindows.yaml"], "eastus", "merged_rp_json.json")

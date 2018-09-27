@@ -47,7 +47,7 @@ class ArmDocumentGenerator:
         dependencies = ArmDocumentGenerator.get_dependencies(sf_json_resources)
         for sf_json_resource in sf_json_resources:
             with open(sf_json_resource, 'r') as sf_json_resource_fp:
-                sf_resource = json.load(sf_json_resource_fp)
+                sf_resource = json.load(sf_json_resource_fp, object_pairs_hook=OrderedDict)
                 kind, description = ArmDocumentGenerator.get_resource_kind_and_description(sf_resource)
                 if kind == Constants.Application:
                     writer = ArmDocumentGenerator.process_application(writer, description, dependencies, property_value_map)
@@ -67,7 +67,7 @@ class ArmDocumentGenerator:
             name = ""
             kind = ""
             with open(sf_json_resource, 'r') as sf_json_resource_fp:
-                resource = json.load(sf_json_resource_fp)
+                resource = json.load(sf_json_resource_fp, object_pairs_hook=OrderedDict)
                 kind, description = ArmDocumentGenerator.get_resource_kind_and_description(resource)
                 schemaversion = Constants.DefaultSchemaVersion
                 for prop, value in description.items():
